@@ -50,6 +50,7 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Gazon")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     NavigationLink { HistoryView() } label: {
@@ -60,7 +61,9 @@ struct HomeView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showNew) { NewIntakeView() }
+            .sheet(isPresented: $showNew) {
+                NewIntakeView().presentationDetents([.large])
+            }
             .alert("Ошибка", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
                 Button("ОК") { error = nil }
             } message: { Text(error ?? "") }
@@ -248,16 +251,23 @@ struct ActiveIntakeView: View {
                     if let cargo = session.cargoPlaces { metric("Грузовых мест", "\(cargo)") }
                     if let label = session.shipmentLabel { metric("Перевозка", label) }
                     if result.progress >= 0.95 { Text("Почти готово").font(.headline) }
-                    Button { showMeasurement = true } label: {
-                        Label("Замер", systemImage: "plus").frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
                     Button("Изменился состав команды") { showTeam = true }
                 }
                 NavigationLink("Подробная статистика") { IntakeDetailView(session: session) }
             }
             .padding()
+        }
+        .safeAreaInset(edge: .bottom) {
+            if result.remainingItems > 0 {
+                Button { showMeasurement = true } label: {
+                    Label("Замер", systemImage: "plus").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.regularMaterial)
+            }
         }
         .sheet(isPresented: $showMeasurement) { AddMeasurementView(session: session) }
         .sheet(isPresented: $showTeam) { TeamChangeView(session: session) }
