@@ -1,0 +1,61 @@
+name: iOS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-project:
+    runs-on: ubuntu-latest
+    outputs:
+      has_project: ${{ steps.project.outputs.has_project }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check documentation and project presence
+        id: project
+        shell: bash
+        run: |
+          test -s README.md
+          test -s SPEC.md
+          if test -f Gazon.xcodeproj/project.pbxproj; then
+            echo 'has_project=true' >> "$GITHUB_OUTPUT"
+            echo 'Xcode project found; build and tests will run.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'has_project=false' >> "$GITHUB_OUTPUT"
+            echo 'Only the specification exists. No iOS build or tests ran.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  build-and-test:
+    needs: check-project
+    if: needs.check-project.outputs.has_project == 'true'
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+      - name: Clean and build for simulator
+        run: |
+          xcodebuild clean build \
+            -project Gazon.xcodeproj -scheme Gazon \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/GazonDerivedData" \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Run unit tests
+        run: |
+          xcodebuild test \
+            -project Gazon.xcodeproj -scheme Gazon \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -derivedDataPath "$RUNNER_TEMP/GazonDerivedData" \
+            -resultBundlePath "$RUNNER_TEMP/GazonTests.xcresult" \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GazonTests-xcresult
+          path: ${{ runner.temp }}/GazonTests.xcresult
+          if-no-files-found: ignore
