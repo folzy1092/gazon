@@ -18,7 +18,7 @@ private func rate(_ value: Double?) -> String {
 
 private func save(_ context: ModelContext, error: Binding<String?>) {
     do { try context.save() }
-    catch { error.wrappedValue = "Не удалось сохранить: \(error.localizedDescription)" }
+    catch let caught { error.wrappedValue = "Не удалось сохранить: \(caught.localizedDescription)" }
 }
 
 struct HomeView: View {
