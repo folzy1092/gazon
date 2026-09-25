@@ -260,7 +260,7 @@ struct SettingsView: View {
             }
             Section("Интерфейс") {
                 Picker("Тема", selection: $theme) {
-                    Text("Как в системе").tag("system")
+                    Text("Системная").tag("system")
                     Text("Светлая").tag("light")
                     Text("Тёмная").tag("dark")
                 }
