@@ -272,7 +272,7 @@ struct SettingsView: View {
         .navigationTitle("Настройки")
         .navigationBarTitleDisplayMode(.inline)
         .safeAreaInset(edge: .bottom) {
-            Text("Gazon · версия \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")")
+            Text("Gazon · версия \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.1")")
                 .font(.footnote).foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
