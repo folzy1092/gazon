@@ -122,7 +122,7 @@ struct IntakeDetailView: View {
         session.measurements.removeAll { $0.id == point.id }
         session.teamChanges.removeAll { event in associated.contains { $0.id == event.id } }
         do { try context.save() }
-        catch { error = "Не удалось удалить замер: \(error.localizedDescription)" }
+        catch { self.error = "Не удалось удалить замер: \(error.localizedDescription)" }
         deletePoint = nil
     }
 }
