@@ -12,7 +12,7 @@ jobs:
     outputs:
       has_project: ${{ steps.project.outputs.has_project }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check documentation and project presence
         id: project
         shell: bash
@@ -32,7 +32,7 @@ jobs:
     if: needs.check-project.outputs.has_project == 'true'
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Select Xcode
         run: |
           sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
@@ -54,7 +54,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO
       - name: Upload test results on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: GazonTests-xcresult
           path: ${{ runner.temp }}/GazonTests.xcresult
