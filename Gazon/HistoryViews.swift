@@ -247,7 +247,9 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section("Замеры") {
-                Toggle("Автоматически использовать текущее время", isOn: $automaticTime)
+                Toggle("Текущее время", isOn: $automaticTime)
+                Text("Время замера берётся при сохранении.")
+                    .font(.footnote).foregroundStyle(.secondary)
             }
             Section("Прогноз") {
                 Picker("Метод", selection: $method) {
@@ -268,6 +270,13 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Настройки")
+        .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom) {
+            Text("Gazon · версия \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")")
+                .font(.footnote).foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+        }
     }
 }
 

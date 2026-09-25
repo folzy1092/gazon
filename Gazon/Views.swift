@@ -66,6 +66,7 @@ struct HomeView: View {
             } message: { Text(error ?? "") }
         }
         .preferredColorScheme(colorScheme)
+        .tint(Color(red: 0.02, green: 0.42, blue: 0.98))
     }
 }
 
@@ -81,25 +82,52 @@ struct NewIntakeView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                DatePicker("Время начала", selection: $start, in: ...Date.now)
-                Section("Отправления") {
-                    HStack {
-                        TextField("Принято", text: $accepted).keyboardType(.numberPad)
-                        Text("/")
-                        TextField("Всего", text: $total).keyboardType(.numberPad)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
+                    Text("Новая приёмка")
+                        .font(.system(.title, design: .rounded, weight: .bold))
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Начало").font(.headline)
+                        DatePicker("Начало", selection: $start, in: ...Date.now,
+                                   displayedComponents: [.date, .hourAndMinute])
+                            .labelsHidden()
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+
+                    HStack(alignment: .top, spacing: 12) {
+                        countField("Принято", text: $accepted, placeholder: "0")
+                        countField("Всего", text: $total, placeholder: "633")
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Дополнительно").font(.headline)
+                        TextField("Грузовых мест", text: $cargo)
+                            .keyboardType(.numberPad)
+                            .textFieldStyle(.roundedBorder)
+                        TextField("Номер перевозки", text: $label)
+                            .textFieldStyle(.roundedBorder)
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+                    if let error { Text(error).foregroundStyle(.red) }
                 }
-                Section("Дополнительно") {
-                    TextField("Грузовых мест", text: $cargo).keyboardType(.numberPad)
-                    TextField("Номер перевозки", text: $label)
-                }
-                if let error { Text(error).foregroundStyle(.red) }
-                Button("Начать приёмку") { create() }
-                    .buttonStyle(.borderedProminent)
-                    .frame(maxWidth: .infinity)
+                .padding(16)
             }
-            .navigationTitle("Новая приёмка")
+            .navigationTitle("Gazon")
+            .navigationBarTitleDisplayMode(.inline)
+            .safeAreaInset(edge: .bottom) {
+                Button("Начать приёмку") { create() }
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .padding(16)
+                    .background(.regularMaterial)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } }
                 ToolbarItemGroup(placement: .keyboard) {
@@ -108,6 +136,20 @@ struct NewIntakeView: View {
                 }
             }
         }
+    }
+
+    private func countField(_ title: String, text: Binding<String>, placeholder: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.headline)
+            TextField(placeholder, text: text)
+                .keyboardType(.numberPad)
+                .font(.title2.weight(.semibold))
+                .textFieldStyle(.roundedBorder)
+                .accessibilityLabel(title)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
     }
 
     private func create() {
@@ -263,6 +305,7 @@ struct AddMeasurementView: View {
                     .buttonStyle(.borderedProminent)
             }
             .navigationTitle("Новый замер")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Отмена") { dismiss() } }
                 ToolbarItemGroup(placement: .keyboard) {
